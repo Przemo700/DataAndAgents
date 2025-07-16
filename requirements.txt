@@ -1,0 +1,9 @@
+streamlit
+google-generativeai
+databricks
+databricks-sql-connector
+databricks-sqlalchemy
+langchain
+langchain-community
+langchain-google-genai
+plotly-express
