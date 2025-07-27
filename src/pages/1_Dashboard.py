@@ -28,7 +28,7 @@ with st.sidebar:
     st.header('Dashboard filters')
 
     # single selct year dropdown - by default last year available preset
-    selected_year = st.selectbox('Year', years, index = len(years)-1)
+    selected_year = st.selectbox('Year', years, index = 0)
 
     # expenditure types dropdown with select all option - all preset by default
     selected_type = st.selectbox('Expenditure Type', types, index = len(types)-1)
@@ -65,10 +65,10 @@ with left_split:
     
     # define color templates for pie pieces
     color_mapping = {
-        'Private': "#D1504A",  # red
-        'Public': "#d7c539",   # blue
-        'Mixed': '#2ECC40',    # green
-        'Unknown': '#AAAAAA'   # gray
+        'Out-of-pocket payments': "#D1504A",  # red
+        'Government and compulsory schemes': "#d7c539",   # blue
+        'Voluntary schemes': '#2ECC40',    # green
+        'Rest of world': '#AAAAAA'   # gray
     }
     
     # define chart in plotly

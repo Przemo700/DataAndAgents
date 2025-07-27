@@ -4,7 +4,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.agents import create_sql_agent, AgentExecutor
 from langchain.agents.agent_toolkits import SQLDatabaseToolkit
 from langchain.sql_database import SQLDatabase
+from langchain.callbacks.base import BaseCallbackHandler
 
+@st.cache_resource(show_spinner="Connecting to Gemini LLM...")
 def get_gemini_llm(gemini_version="gemini-2.5-flash"):
     try:
         os.environ["GOOGLE_API_KEY"] = st.secrets['GOOGLE_API_KEY']
@@ -14,7 +16,8 @@ def get_gemini_llm(gemini_version="gemini-2.5-flash"):
     except Exception as e:
         st.error(f"Error while calling Gemini API: {e}")
         return None
-    
+
+@st.cache_resource(show_spinner="Establishing Databricks connection...")    
 def get_database_connection(bricks_catalog = "workspace", bricks_schema = "eurostat"):
     try:
         host_url = st.secrets['DATABRICKS_WORKSPACE']
@@ -35,7 +38,8 @@ def get_database_connection(bricks_catalog = "workspace", bricks_schema = "euros
     except Exception as e:
         st.error(f"Error while connecting to Databricks: {e}")
         return None
-    
+
+@st.cache_resource(show_spinner="Creating AI Agent...")    
 def create_ai_agent(llm = get_gemini_llm(), db = get_database_connection()):
 
     if llm and db:
@@ -53,14 +57,23 @@ def create_ai_agent(llm = get_gemini_llm(), db = get_database_connection()):
             st.error(f"Not able to create SQL agent: {e}")
             return None
         
+class SQLHandler(BaseCallbackHandler):
+
+    def __init__(self):
+        self.sql_result = []
+
+    def on_agent_action(self, action, **kwargs):
+        if action.tool in ["sql_db_query"]:
+            self.sql_result.append(action.tool_input)
+        
 class AgentWrapper:
     
     def __init__(self, agent):
         self.agent = agent
     
-    def run(self, query):
+    def run(self, query, callbacks=None):
         try:
-            result = self.agent.invoke(query)
+            result = self.agent.invoke({"input":query}, {"callbacks": callbacks or []})
             return result['output']
         except Exception as e:
             # For parsing errors only - extract llm output that should be placed between first and last bactick
@@ -82,6 +95,9 @@ def ask_agent(user_input, history, my_agent=create_ai_agent()):
         # handling frequent errors of original SQL agent realated to parsing orginial LLM response
         enhanced_agent = AgentWrapper(my_agent)
 
+        # crate callback handler to capture produced SQL queries
+        sql_handler = SQLHandler()
+
         # injecting full conversation history into prompt
         formatted_history = ""
 
@@ -98,8 +114,14 @@ def ask_agent(user_input, history, my_agent=create_ai_agent()):
 
         # calling enhanced agent with prompt augemented with history context
         try:
-            response = enhanced_agent.run(combined_input)
-            return response
+            response = enhanced_agent.run(combined_input, callbacks=[sql_handler])
+            return {
+                "text": response,
+                "logs": sql_handler.sql_result
+            }
         
         except Exception as e:
-            return f"Sorry, but there was an error while preparing answer: {e}"
+            return {
+                "text:": f"Sorry, but there was an error while preparing answer: {e}",
+                "logs": sql_handler.sql_result
+            }
