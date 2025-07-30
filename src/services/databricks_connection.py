@@ -5,7 +5,7 @@ import streamlit as st
 
 # Initialize connection with databricks client using credentials
 
-@st.cache_resource(ttl=3600)
+@st.cache_resource(show_spinner="Establishing Databricks connection...")
 def get_databricks_client():
     try:
         server_hostname = st.secrets['DATABRICKS_WORKSPACE']
@@ -25,7 +25,7 @@ def get_databricks_client():
 
 # Execute SQL query using established connection to Datbricks Warehouse
 
-@st.cache_data(ttl=600) 
+@st.cache_data(show_spinner="Executing SQL query...") 
 def execute_sql_query(pushdown_query):
     client = get_databricks_client()
     if client:

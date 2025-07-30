@@ -10,48 +10,88 @@ shared_page_header(
 )
 
 intro =  (
-    "Following app consists of two pages showing two ways of data consumption: "
-    "classical interactive data dashboard and chat with AI agent, showing two ways of data exploration. "
-    "Both pages are live connected to the same database in Databricks (Free Edition)."
+    "Hello! Welcome to my Streamlit project. "
+    "App you're seeing consists of two pages showing two ways of data consumption: "
+    "classical interactive dashboard and chat with AI agent having access to the same database. "
+    "Source data was pulled from Eurostat through their official API and then processed and saved "
+    "in Databricks platform (Free Edition). Hence please be mindful the loading time"
+    " of both pages might be a bit longer due to initializing live connection to Databricks SQL Warehouse."
 )
 
 databricks_line = (
-    "App's database was built in Databricks, from data downloaded from Eurostat via official API. "
-    "Some ETL processing was performed in PySpark and data was saved as unity catalog tables"
+    "Source data was produced in Databricks with notebooks and PySpark and results saved as unity catalog tables "
+    "in dedicated schema. Additional semantic layer was created adding definitions for all tables and columns."
 )
 
 dashboard_line = (
-    "Dashboard page is fetching data from source connecting to provided SQL warehouse. "
-    "Then the visuals are created using PyPlot framework embedded in Streamlit frontend."
+    "All data visualizations are created using python's Plotly Express module being a sub part of general "
+    "Plotly library. Data for figures fetched from Databricks is loaded and processed in Pandas dataframes."
 )
 
 agent_line = (
-    "For chatbot part I'm using standard Streamlit's chat elements "
-    "and agent himself was developed in LangChain framweork and Gemini 2.5 Flash LLM."
+    "Data agent used in chatbot is developed within LangChain framework utilizing Gemini 2.5 Flash API "
+    "as input LLM. One of the standard sql agent classes was deployed with some additional enhancements."
 )
 
-left_col, right_col = st.columns([4,2])
+left_col, buffer, right_col = st.columns([4,0.5,1.5])
 
 with left_col:
-    st.markdown(f"""
+
+    st.markdown("")
+    st.markdown(intro)
+
+    st.markdown("""
         <h1 style='
-            font-size: 16px;
-            color: #000000;
-            padding: 20px;
-        '>{intro}
+            font-family: "Source Sans Pro", sans-serif;
+            font-size: 18px;
+            color: #4F4F4F;
+            margin-top: 6px;
+            margin-bottom: 10px;
+        '>App components
         </h1>
-        <ul style='margin-top: 10px; padding-left: 10px;list-style-type: none;'>
-            <li style='font-size: 14px; margin-bottom: 8px;'>{databricks_line}</li>
-            <li style='font-size: 14px; margin-bottom: 8px;'>{dashboard_line}</li>
-            <li style='font-size: 14px; margin-bottom: 8px;'>{agent_line}</li>
-        </ul>
-        <style>
-        li::before {{
-            content: '★';
-            position: absolute;
-            left: 0;
-            color: #ababab;
-        }}
-        </style>
     """, unsafe_allow_html=True
+    )
+
+    tab1, tab2, tab3 = st.tabs(["SQL database", "Interactive data visuals", "AI chatbot agent"])
+    
+    with tab1:
+        st.write(databricks_line)
+        st.image("src/assets/databricks.png", width=175)
+    with tab2:
+        st.write(dashboard_line)
+        st.image("src/assets/plotly.png", width=175)
+    with tab3:
+        st.write(agent_line)
+        st.image("src/assets/langchain.png", width=175)
+
+with right_col:
+    st.markdown("### About me:")
+    st.markdown("")
+
+    # Inline LinkedIn icon and link
+    st.markdown(
+        """
+        <p style="display: flex; align-items: center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="20" style="margin-right: 8px;" />
+            <a href="https://www.linkedin.com/in/przemysław-kazimierski-77a1942aa" target="_blank" style="font-size: 16px; text-decoration: none;">
+                My LinkedIn Profile
+            </a>
+        </p>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown("")
+
+    # Inline GitHub icon and link
+    st.markdown(
+        """
+        <p style="display: flex; align-items: center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" width="20" style="margin-right: 8px;" />
+            <a href="https://github.com/Przemo700?tab=repositories" target="_blank" style="font-size: 16px; text-decoration: none;">
+                My GitHub Projects
+            </a>
+        </p>
+        """,
+        unsafe_allow_html=True
     )
