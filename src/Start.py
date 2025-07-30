@@ -1,3 +1,11 @@
+import sys
+import os
+
+# adding additional root directory mapping to walk around the streamlit cloud architecture limitation
+current_dir = os.path.dirname(os.path.abspath(__file__))
+repo_root = os.path.dirname(current_dir)
+sys.path.append(repo_root)
+
 import streamlit as st
 from src.components.ui_elements import shared_page_header
 
