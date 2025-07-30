@@ -67,7 +67,7 @@ with left_col:
         st.image("src/assets/databricks.png", width=175)
     with tab2:
         st.write(dashboard_line)
-        st.image("src/assets/plotly.png", width=175)
+        st.image("src/assets/plotly-ex.png", width=175)
     with tab3:
         st.write(agent_line)
         st.image("src/assets/langchain.png", width=175)
