@@ -40,7 +40,10 @@ def get_database_connection(bricks_catalog = "workspace", bricks_schema = "euros
         return None
 
 @st.cache_resource(show_spinner="Creating AI Agent...")    
-def create_ai_agent(llm = get_gemini_llm(), db = get_database_connection()):
+def create_ai_agent():
+
+    llm = get_gemini_llm()
+    db = get_database_connection()
 
     if llm and db:
         try:
@@ -88,8 +91,10 @@ class AgentWrapper:
         # Delegate other methods to the wrapped agent
         return getattr(self.agent, name)
         
-def ask_agent(user_input, history, my_agent=create_ai_agent()):
+def ask_agent(user_input, history):
 
+    my_agent = create_ai_agent()
+    
     if my_agent:
 
         # handling frequent errors of original SQL agent realated to parsing orginial LLM response
