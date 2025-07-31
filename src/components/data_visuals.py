@@ -49,8 +49,11 @@ def draw_bar_chart(df, metric):
 
     # Define chart coordinates
     y_avg = df[metric].mean()
-    x_start = df['Country_Code'].iloc[0]
-    x_end = df['Country_Code'].iloc[-1]
+    try:
+        x_start = df['Country_Code'].iloc[0]
+        x_end = df['Country_Code'].iloc[-1]
+    except:
+        x_start, x_end = None, None
 
     # Create bar chart
     fig = px.bar(
