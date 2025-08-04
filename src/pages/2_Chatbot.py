@@ -44,10 +44,11 @@ if user_input:
     st.chat_message("user").markdown(user_input)
 
     # Send user's message to Gemini and get the response
-    gemini_response = ask_agent(user_input, st.session_state.chat_session)
-
-    # Display Gemini's response
     with st.chat_message("assistant"):
+        with st.spinner("Wait a sec! I'm exploring data and analyzing results."):
+            gemini_response = ask_agent(user_input, st.session_state.chat_session)
+        
+        # Display Gemini's response
         st.markdown(gemini_response['text'])
 
     # Add user and assistant messages to the chat history
