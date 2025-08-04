@@ -39,7 +39,7 @@ def get_database_connection(bricks_catalog = "workspace", bricks_schema = "euros
         st.error(f"Error while connecting to Databricks: {e}")
         return None
 
-@st.cache_resource(show_spinner="Creating AI Agent...")    
+@st.cache_resource(show_spinner="Creating AI Agent...")
 def create_ai_agent():
 
     llm = get_gemini_llm()
@@ -97,36 +97,38 @@ def ask_agent(user_input, history):
     
     if my_agent:
 
-        # handling frequent errors of original SQL agent realated to parsing orginial LLM response
-        enhanced_agent = AgentWrapper(my_agent)
+        with st.spinner("Wait a sec! I'm exploring data and analyzing results."):
 
-        # crate callback handler to capture produced SQL queries
-        sql_handler = SQLHandler()
+            # handling frequent errors of original SQL agent realated to parsing orginial LLM response
+            enhanced_agent = AgentWrapper(my_agent)
 
-        # injecting full conversation history into prompt
-        formatted_history = ""
+            # crate callback handler to capture produced SQL queries
+            sql_handler = SQLHandler()
 
-        for msg in history:
-            if msg["role"] == 'user':
-                formatted_history += f"Human: {msg['content']}\n"
-            elif msg['role'] == 'assistant':
-                formatted_history += f"AI: {msg['content']}\n"
+            # injecting full conversation history into prompt
+            formatted_history = ""
 
-        if formatted_history:
-            combined_input = f"Previous conversation:\n{formatted_history}\nNew question: {user_input}"
-        else:
-            combined_input = user_input
+            for msg in history:
+                if msg["role"] == 'user':
+                    formatted_history += f"Human: {msg['content']}\n"
+                elif msg['role'] == 'assistant':
+                    formatted_history += f"AI: {msg['content']}\n"
 
-        # calling enhanced agent with prompt augemented with history context
-        try:
-            response = enhanced_agent.run(combined_input, callbacks=[sql_handler])
-            return {
-                "text": response,
-                "logs": sql_handler.sql_result
-            }
-        
-        except Exception as e:
-            return {
-                "text:": f"Sorry, but there was an error while preparing answer: {e}",
-                "logs": sql_handler.sql_result
-            }
+            if formatted_history:
+                combined_input = f"Previous conversation:\n{formatted_history}\nNew question: {user_input}"
+            else:
+                combined_input = user_input
+
+            # calling enhanced agent with prompt augemented with history context
+            try:
+                response = enhanced_agent.run(combined_input, callbacks=[sql_handler])
+                return {
+                    "text": response,
+                    "logs": sql_handler.sql_result
+                }
+            
+            except Exception as e:
+                return {
+                    "text:": f"Sorry, but there was an error while preparing answer: {e}",
+                    "logs": sql_handler.sql_result
+                }
